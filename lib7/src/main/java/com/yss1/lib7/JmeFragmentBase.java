@@ -53,6 +53,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 
@@ -84,6 +85,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListene
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import static com.google.android.gms.internal.zzir.runOnUiThread;
 */
+import com.google.firebase.auth.FirebaseAuth;
 import com.jme3.app.AndroidHarnessFragment;
 
 
@@ -117,6 +119,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     protected AdRequest bannerRequest;
     protected AppIF jmeapp;
     protected SharedPreferences mSettings;
+    protected FirebaseAuth mAuth;
     //    protected GoogleApiClient mGoogleApiClient;
     protected long startTime;
     protected FirebaseAnalytics mFirebaseAnalytics;
@@ -278,6 +281,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         });
         setBannersId();
         loadAd();
+
+        mAuth = FirebaseAuth.getInstance();
+
     }
 
     private void checkVersion() {
@@ -431,8 +437,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     }
 
 
-/*ad block
-*/
+//region AD
 
     public void setBannersId() {
         //set id for mAdView and m InterstitialAD
@@ -536,9 +541,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             loadAd();
         }
     }
-///////////////////End of AD
+//endregion AD
 
-//SETTINGS SAVE_LOAD
+//region SETTINGS SAVE_LOAD
 
     @Override
     public Map<String, ?> readAll() {
@@ -663,7 +668,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public boolean loadSettingBool(String key, boolean def) {
         return mSettings.getBoolean(key, def);
     }
-    //END of SETTINGS SAVE_LOAD
+    //endregion of SETTINGS SAVE_LOAD
 
     //Google Analytics
     @Override
@@ -768,6 +773,17 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     @Override
     public void showMessage(String tit, String msg) {
 
+        new MessageDialog().init(tit, msg).show(getFragmentManager(), "msg");
+    }
+
+
+    @Override
+    public void showInfo(String tit) {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                //.requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        String msg=mAuth.getCurrentUser()!=null?mAuth.getCurrentUser().getDisplayName():"null";
         new MessageDialog().init(tit, msg).show(getFragmentManager(), "msg");
     }
 
