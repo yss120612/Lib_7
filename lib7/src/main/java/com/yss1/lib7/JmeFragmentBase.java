@@ -53,9 +53,16 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
+//import com.google.firebase.quickstart.auth.databinding.ActivityGoogleBinding;
 
 //import com.google.android.gms.analytics.HitBuilders;
 //import com.google.android.gms.analytics.Tracker;
@@ -85,7 +92,11 @@ import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListene
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import static com.google.android.gms.internal.zzir.runOnUiThread;
 */
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.jme3.app.AndroidHarnessFragment;
 
 
@@ -120,10 +131,13 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     protected AppIF jmeapp;
     protected SharedPreferences mSettings;
     protected FirebaseAuth mAuth;
+    protected FirebaseUser user;
+    protected GoogleSignInClient mGoogleSignInClient;
     //    protected GoogleApiClient mGoogleApiClient;
     protected long startTime;
     protected FirebaseAnalytics mFirebaseAnalytics;
     //protected static GoogleAnalytics analytics;
+    //protected ActivityGoogleBinding mBinding;
 
     //    protected Room  mRoom;
     protected String mIncomingInvitationId;
@@ -280,8 +294,29 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             }
         });
         setBannersId();
+
+        connect2Google();
+
         loadAd();
 
+
+
+
+
+    }
+
+    //@RequiresApi(api = Build.VERSION_CODES.O)
+    protected void connect2Google(){
+        if (!haveNetworkConnection()) return;
+        //mBinding = ActivityGoogleBinding.inflate(getLayoutInflater());
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("544332688717-v1et00gmva5kbnn24p926rqkl358pnmf.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
         mAuth = FirebaseAuth.getInstance();
 
     }
@@ -331,6 +366,53 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+
+    private void signIn() {
+
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                Log.d("Yss1", "firebaseAuthWithGoogle:" + account.getId());
+                firebaseAuthWithGoogle(account.getIdToken());
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w("Yss1", "Google sign in failed", e);
+                // ...
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this.getActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("Yss1", "signInWithCredential:success");
+                            user = mAuth.getCurrentUser();
+                            //updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("Yss1", "signInWithCredential:failure", task.getException());
+                            //Snackbar.make(mBinding.mainLayout, "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            //updateUI(null);
+                        }
+
+                        // ...
+                    }
+                });
+    }
+
 
     @Override
     public void onResume() {
@@ -779,11 +861,11 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public void showInfo(String tit) {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                //.requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        String msg=mAuth.getCurrentUser()!=null?mAuth.getCurrentUser().getDisplayName():"null";
+
+//FirebaseUser uer = mAuth.getCurrentUser();
+
+        String msg=mAuth.getUid();
+                //=mAuth.getCurrentUser()!=null?mAuth.getCurrentUser():"null";
         new MessageDialog().init(tit, msg).show(getFragmentManager(), "msg");
     }
 
@@ -958,6 +1040,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
         }
     }
+
+
+
 
 /*
     //Google play

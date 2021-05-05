@@ -12,14 +12,8 @@ android {
         versionCode 1
         versionName "1.0"
 
-        signingConfigs {
-            release {
-                storeFile file('C:\\gamedev\\keys\\ysskeys.keystore')
-                keyAlias 'ysskey1'
-                keyPassword 'Gp25SLqB'
-                storePassword 'ysuiop'
-            }
-        }
+
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         versionNameSuffix '0'
