@@ -50,9 +50,11 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
+//import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -124,20 +126,24 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 {
     //protected MobileAds mMobileAds;
     protected AdView mAdView;
+    protected String mAdViewID;
     protected InterstitialAd mInterstitialAd;
+    protected String mInterstitialAdID;
 
 
-    protected AdRequest bannerRequest;
+    //protected AdRequest bannerRequest;
     protected AppIF jmeapp;
     protected SharedPreferences mSettings;
     protected FirebaseAuth mAuth;
     protected FirebaseUser user;
     protected GoogleSignInClient mGoogleSignInClient;
+    protected String mClientID;
     //    protected GoogleApiClient mGoogleApiClient;
     protected long startTime;
     protected FirebaseAnalytics mFirebaseAnalytics;
     //protected static GoogleAnalytics analytics;
     //protected ActivityGoogleBinding mBinding;
+    //private lateinit var mBinding: ResultProfileBinding
 
     //    protected Room  mRoom;
     protected String mIncomingInvitationId;
@@ -260,49 +266,10 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         super.onViewCreated(view, savedInstanceState);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity().getBaseContext());
         MobileAds.initialize(getActivity().getBaseContext());
-        mInterstitialAd = new InterstitialAd(getActivity().getBaseContext());
-        if (AD_BANNER) {
-            mAdView = new AdView(getActivity().getBaseContext());
-            mAdView.setAdSize(AdSize.BANNER);
-
-//            adView.setAdSize(AdSize.SMART_BANNER); //Размер баннера
-            FrameLayout LL=new FrameLayout(this.getActivity());
-            LL.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP+Gravity.RIGHT));
-
-            frameLayout.addView(LL);
-            //adView.setAdListener(this);
-            LL.addView(mAdView);
-            mAdView.setVisibility(View.GONE);
-        }
-
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                loadAd();
-            }
-
-            @Override
-            public void onAdLoaded() {
-
-//                }
-            }
-
-            @Override
-            public void onAdFailedToLoad(LoadAdError error) {
-                Log.w("AD", "onAdFailedToLoad:" + error.getMessage());
-            }
-        });
         setBannersId();
-
-        connect2Google();
-
+        initBanner();
         loadAd();
-
-
-
-
-
+        connect2Google();
     }
 
     //@RequiresApi(api = Build.VERSION_CODES.O)
@@ -310,7 +277,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         if (!haveNetworkConnection()) return;
         //mBinding = ActivityGoogleBinding.inflate(getLayoutInflater());
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("544332688717-v1et00gmva5kbnn24p926rqkl358pnmf.apps.googleusercontent.com")
+                .requestIdToken(mClientID)
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
@@ -384,7 +351,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-                Log.w("Yss1", "Google sign in failed", e);
+                Log.w("Yss1", "Google sign in failed:"+e.getLocalizedMessage(), e);
                 // ...
             }
         }
@@ -400,6 +367,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("Yss1", "signInWithCredential:success");
                             user = mAuth.getCurrentUser();
+
                             //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -491,7 +459,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         long tm = (System.nanoTime() - startTime);
         startTime = System.nanoTime();
         //Log.i("Yss", "("+android.os.Build.MODEL+")"+theme+" ["+String.format("%.3f", tm/1000000000.0f)+"s]");
-        Log.i("Yss", theme + " [" + String.format("%.3f", tm / 1000000000.0f) + "s]");
+        Log.i("Yss1", theme + " [" + String.format("%.3f", tm / 1000000000.0f) + "s]");
     }
 
     @Override
@@ -570,13 +538,14 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         });
     }
 
+
     @Override
     public void loadAd() {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    if (!mInterstitialAd.isLoaded()) {
+             try {
+                    if (mInterstitialAd==null) {
                         requestNewInterstitial();
                     }
                     if (mAdView != null) {
@@ -589,9 +558,47 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         });
     }
 
+    public void initBanner(){
+        if (AD_BANNER) {
+            mAdView = new AdView(getActivity().getBaseContext());
+            mAdView.setAdSize(AdSize.BANNER);
+
+//            adView.setAdSize(AdSize.SMART_BANNER); //Размер баннера
+            FrameLayout LL=new FrameLayout(this.getActivity());
+            LL.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP+Gravity.RIGHT));
+
+            frameLayout.addView(LL);
+            //adView.setAdListener(this);
+            LL.addView(mAdView);
+            mAdView.setVisibility(View.GONE);
+            mAdView.setAdUnitId(mAdViewID);
+        }
+    }
+
+
     public void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder().build();
-        mInterstitialAd.loadAd(adRequest);
+        InterstitialAd.load(getActivity().getBaseContext(),mInterstitialAdID, adRequest, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                // The mInterstitialAd reference will be null until
+                // an ad is loaded.
+                mInterstitialAd = interstitialAd;
+                Log.i("Yss1", "onAdLoaded");
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                // Handle the error
+                Log.i("Yss1", loadAdError.getMessage());
+                mInterstitialAd = null;
+            }
+        });
+
+
+        //AdRequest adRequest = new AdRequest.Builder().build();
+        //mInterstitialAd.loadAd(adRequest);
     }
 
     @Override
@@ -600,7 +607,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             @Override
             public void run() {
                 try {
-                    tmp_ad_loaded = mInterstitialAd.isLoaded();
+                    tmp_ad_loaded = mInterstitialAd!=null;
                 } catch (Exception e) {
                     tmp_ad_loaded = false;
                     Log.d("Yss", "tmp_loaded Error" + e.getMessage());
@@ -612,16 +619,19 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public void displayInterstitial() {
-        if (isInterstitialLoaded()) {
+        if (mInterstitialAd != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mInterstitialAd.show();
+                    mInterstitialAd.show(getActivity());
                 }
             });
+
         } else {
+            Log.d("Yss1", "The interstitial ad wasn't ready yet.");
             loadAd();
         }
+
     }
 //endregion AD
 
