@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -40,6 +41,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,7 +52,6 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-//import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
@@ -64,13 +65,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
-//import com.google.firebase.quickstart.auth.databinding.ActivityGoogleBinding;
-
-//import com.google.android.gms.analytics.HitBuilders;
-//import com.google.android.gms.analytics.Tracker;
-//import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.common.ConnectionResult;
-
 
 /*
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -99,6 +93,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.jme3.app.AndroidHarnessFragment;
 
 
@@ -112,6 +107,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static android.app.Activity.RESULT_OK;
+
 
 public class JmeFragmentBase extends AndroidHarnessFragment implements
         AndroidIF
@@ -265,28 +263,19 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity().getBaseContext());
+        mAuth = FirebaseAuth.getInstance();
         MobileAds.initialize(getActivity().getBaseContext());
         setBannersId();
         initBanner();
         loadAd();
-        connect2Google();
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.O)
-    protected void connect2Google(){
-        if (!haveNetworkConnection()) return;
-        //mBinding = ActivityGoogleBinding.inflate(getLayoutInflater());
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(mClientID)
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-        mAuth = FirebaseAuth.getInstance();
+    //override for set id's
+    public void setBannersId(){
 
     }
+
 
     private void checkVersion() {
         try {
@@ -334,8 +323,60 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         return haveConnectedWifi || haveConnectedMobile;
     }
 
-    private void signIn() {
 
+    @Override
+    public void signIn() {
+        if (!haveNetworkConnection()) return;
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(mClientID)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+        //Task<> ts=mGoogleSignInClient.signOut();
+
+//                new OnCompleteListener<GoogleSignInAccount>() {
+//            @Override
+//            public void onComplete(Task<GoogleSignInAccount> task) {
+//                try {
+//                     GoogleSignInAccount signInAccount = task.getResult(ApiException.class);
+//                    showInfo("Success logout");
+//                   } catch (ApiException apiException) {
+//                    showInfo("failure logout"+apiException.getStatusCode());
+//                    // You can get from apiException.getStatusCode() the detailed error code
+//                    // e.g. GoogleSignInStatusCodes.SIGN_IN_REQUIRED means user needs to take
+//                    // explicit action to finish sign-in;
+//                    // Please refer to GoogleSignInStatusCodes Javadoc for details
+//                    //updateButtonsAndStatusFromErrorCode(apiException.getStatusCode());
+//                }
+//            }
+//        });
+        signOut(true);
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+@Override
+    public void signOut(boolean google_signout){
+        if (google_signout) {
+            Task<Void> task = mGoogleSignInClient.signOut();
+            task.addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(Task<Void> t) {
+                    Toast.makeText(getActivity().getBaseContext(), "Signed out", Toast.LENGTH_SHORT).show();
+                    // showInfo("Success logout");
+                }
+            });
+        }
+        if (mAuth!=null) mAuth.signOut();
+        user = mAuth.getCurrentUser();
+    }
+
+
+
+    @Override
+    public boolean isSignedIn(){
+
+        return user!=null;
     }
 
 
@@ -343,32 +384,36 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.d("Yss1", "firebaseAuthWithGoogle:" + account.getId());
-                firebaseAuthWithGoogle(account.getIdToken());
-            } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-                Log.w("Yss1", "Google sign in failed:"+e.getLocalizedMessage(), e);
-                // ...
+            if (resultCode == RESULT_OK) {
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                try {
+                    // Google Sign In was successful, authenticate with Firebase
+                    GoogleSignInAccount account =  task.getResult(ApiException.class);
+                    firebaseAuthWithGoogle(account.getIdToken());
+                    Toast.makeText(getActivity().getBaseContext(),"Sign in as "+account.getDisplayName(),Toast.LENGTH_SHORT ).show();
+                } catch (ApiException e) {
+                    // Google Sign In failed, update UI appropriately
+                    Log.w("Yss1", "Google sign in failed:" , e);
+                    showMessage("Connection failed","not connected "+e.getLocalizedMessage());
+                }
+            } else {
+                Log.d("Yss1", "Login canceled by user");
+                showMessage("NOT Connected","user cancelled");
             }
         }
     }
 
+
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this.getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d("Yss1", "signInWithCredential:success");
                             user = mAuth.getCurrentUser();
-
-                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("Yss1", "signInWithCredential:failure", task.getException());
@@ -376,8 +421,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                             //updateUI(null);
                         }
 
-                        // ...
-                    }
+                                            }
                 });
     }
 
@@ -408,9 +452,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public void onPause() {
         saveSettingBool("AUTOLOGON", mAutoStartSignIn);
 
-        if (!mPlaying && !GP_MULTIPLAYER) {
-            gp_Disconnect();
-        }
+//        if (!mPlaying && !GP_MULTIPLAYER) {
+//            gp_Disconnect();
+//        }
         super.onPause();//calling loseFocus here (see in Main)
     }
 
@@ -422,9 +466,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             mAdView.pause();
         }
 
-        if (gp_isSignedIn() && !mPlaying) {
-            // gp_Disconnect();
-        }
+//        if (gp_isSignedIn() && !mPlaying) {
+//            // gp_Disconnect();
+//        }
         jmeapp.appStop();
         super.onStop(); //To change body of generated methods, choose Tools | Templates.
     }
@@ -489,9 +533,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
 //region AD
 
-    public void setBannersId() {
-        //set id for mAdView and m InterstitialAD
-    }
+
 
 
     @Override
@@ -513,6 +555,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     }
 
     private void shBanner() {
+        if (mAdView == null) {
+            return;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -527,6 +572,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     }
 
     private void hideBanner() {
+        if (mAdView == null) {
+            return;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -558,7 +606,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         });
     }
 
-    public void initBanner(){
+    private void initBanner(){
         if (AD_BANNER) {
             mAdView = new AdView(getActivity().getBaseContext());
             mAdView.setAdSize(AdSize.BANNER);
@@ -577,7 +625,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     }
 
 
-    public void requestNewInterstitial() {
+    private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(getActivity().getBaseContext(),mInterstitialAdID, adRequest, new InterstitialAdLoadCallback() {
             @Override
@@ -873,10 +921,25 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public void showInfo(String tit) {
 
 //FirebaseUser uer = mAuth.getCurrentUser();
-
-        String msg=mAuth.getUid();
-                //=mAuth.getCurrentUser()!=null?mAuth.getCurrentUser():"null";
-        new MessageDialog().init(tit, msg).show(getFragmentManager(), "msg");
+        user = mAuth.getCurrentUser();
+        String info="";
+        if (user != null) {
+            for (UserInfo profile : user.getProviderData()) {
+                // Id of the provider (ex: google.com)
+                info+="ProviderId=";
+                info+=profile.getProviderId();
+                info+=" Uid=";
+                info+=profile.getUid();
+                info+=" name=";
+                info+=profile.getDisplayName();
+                info+=" email=";
+                info+=profile.getEmail();
+           }
+        }
+        else{
+            info="User is null";
+        }
+        new MessageDialog().init(tit, info).show(getFragmentManager(), "msg");
     }
 
     public int getID(int idFor) {
