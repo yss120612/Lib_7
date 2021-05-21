@@ -136,7 +136,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     protected FirebaseUser user;
     protected GoogleSignInClient mGoogleSignInClient;
     protected String mClientID;
-    //    protected GoogleApiClient mGoogleApiClient;
+    protected String mURLdb;
     protected long startTime;
     protected FirebaseAnalytics mFirebaseAnalytics;
     //protected static GoogleAnalytics analytics;
@@ -193,7 +193,6 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         startTime = System.nanoTime();
         mInterstitialAd = null;
         trakerSent = false;
-        //displayName="Nobody";
         GP_ACTIVATE = false;
         GP_MULTIPLAYER = false;
         AD_BANNER = false;
@@ -216,45 +215,6 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-
-
-//            adView=new AdView(this.getActivity());
-//            //Присвоить свой
-//            //adView.setAdUnitId("ca-app-pub-3940256099942544~3347511713");
-//            adView.setAdSize(AdSize.SMART_BANNER); //Размер баннера
-//            FrameLayout LL=new FrameLayout(this.getActivity());
-//            LL.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-//                    ViewGroup.LayoutParams.WRAP_CONTENT,
-//                    //Gravity.TOP+Gravity.RIGHT));
-//                    Gravity.CENTER_HORIZONTAL));
-//            frameLayout.addView(LL);
-//            //adView.setAdListener(this);
-//            LL.addView(adView);
-//        }
-        //interstitialAd = new InterstitialAd(getActivity().getBaseContext());
-        //Присвоить свой
-        //interstitialAd.setAdUnitId("ca-app-pub-3940256099942544~3347511713");
-
-//        interstitialAd.setAdListener(new AdListener() {
-//            @Override
-//            public void onAdClosed() {
-//                requestNewInterstitial();
-//            }
-//
-//            @Override
-//            public void onAdLoaded() {
-//                // Ad received, ready to display
-////                if (mLoadInterstitialButton != null) {
-////                    mLoadInterstitialButton.setEnabled(true);
-////                }
-//            }
-//
-//            @Override
-//            public void onAdFailedToLoad(LoadAdError error) {
-////                Log.w(TAG, "onAdFailedToLoad:" + error.getMessage());
-//            }
-//        });
-
         return v;
     }
 
@@ -332,24 +292,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-        //Task<> ts=mGoogleSignInClient.signOut();
 
-//                new OnCompleteListener<GoogleSignInAccount>() {
-//            @Override
-//            public void onComplete(Task<GoogleSignInAccount> task) {
-//                try {
-//                     GoogleSignInAccount signInAccount = task.getResult(ApiException.class);
-//                    showInfo("Success logout");
-//                   } catch (ApiException apiException) {
-//                    showInfo("failure logout"+apiException.getStatusCode());
-//                    // You can get from apiException.getStatusCode() the detailed error code
-//                    // e.g. GoogleSignInStatusCodes.SIGN_IN_REQUIRED means user needs to take
-//                    // explicit action to finish sign-in;
-//                    // Please refer to GoogleSignInStatusCodes Javadoc for details
-//                    //updateButtonsAndStatusFromErrorCode(apiException.getStatusCode());
-//                }
-//            }
-//        });
         signOut(true);
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -375,7 +318,6 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public boolean isSignedIn(){
-
         return user!=null;
     }
 
@@ -533,9 +475,6 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
 //region AD
 
-
-
-
     @Override
     public boolean isBannerVisible() {
        return mAdView.getVisibility()==View.VISIBLE;
@@ -610,14 +549,11 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         if (AD_BANNER) {
             mAdView = new AdView(getActivity().getBaseContext());
             mAdView.setAdSize(AdSize.BANNER);
-
-//            adView.setAdSize(AdSize.SMART_BANNER); //Размер баннера
             FrameLayout LL=new FrameLayout(this.getActivity());
             LL.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP+Gravity.RIGHT));
 
             frameLayout.addView(LL);
-            //adView.setAdListener(this);
             LL.addView(mAdView);
             mAdView.setVisibility(View.GONE);
             mAdView.setAdUnitId(mAdViewID);
@@ -630,10 +566,8 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         InterstitialAd.load(getActivity().getBaseContext(),mInterstitialAdID, adRequest, new InterstitialAdLoadCallback() {
             @Override
             public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                // The mInterstitialAd reference will be null until
-                // an ad is loaded.
-                mInterstitialAd = interstitialAd;
-                Log.i("Yss1", "onAdLoaded");
+                 mInterstitialAd = interstitialAd;
+ //               Log.i("Yss1", "onAdLoaded");
             }
 
             @Override
@@ -816,12 +750,6 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.LEVEL_NAME, app + "_" + s);
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LEVEL_START, bundle);
-
-//        mTracker.send(new HitBuilders.EventBuilder()
-//                .setCategory(app+"_Event-Category1")
-//                .setAction(app+"_Event-Action1")
-//                .setLabel(s)
-//                .build());
     }
 
     @Override
@@ -919,8 +847,6 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public void showInfo(String tit) {
-
-//FirebaseUser uer = mAuth.getCurrentUser();
         user = mAuth.getCurrentUser();
         String info="";
         if (user != null) {
