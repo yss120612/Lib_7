@@ -66,6 +66,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+
 /*
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -94,6 +95,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jme3.app.AndroidHarnessFragment;
 
 
@@ -137,6 +143,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     protected GoogleSignInClient mGoogleSignInClient;
     protected String mClientID;
     protected String mURLdb;
+    protected DatabaseReference mDatabase;
     protected long startTime;
     protected FirebaseAnalytics mFirebaseAnalytics;
     //protected static GoogleAnalytics analytics;
@@ -155,8 +162,8 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
 
     protected boolean trakerSent;
-    protected static boolean GP_ACTIVATE;
-    protected static boolean GP_MULTIPLAYER;
+//    protected static boolean GP_ACTIVATE;
+//    protected static boolean GP_MULTIPLAYER;
     protected static boolean AD_BANNER;
 
     private boolean off_screen;
@@ -193,8 +200,8 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         startTime = System.nanoTime();
         mInterstitialAd = null;
         trakerSent = false;
-        GP_ACTIVATE = false;
-        GP_MULTIPLAYER = false;
+//        GP_ACTIVATE = false;
+//        GP_MULTIPLAYER = false;
         AD_BANNER = false;
     }
 
@@ -225,14 +232,14 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity().getBaseContext());
         mAuth = FirebaseAuth.getInstance();
         MobileAds.initialize(getActivity().getBaseContext());
-        setBannersId();
+        setIds();
         initBanner();
         loadAd();
     }
 
 
     //override for set id's
-    public void setBannersId(){
+    public void setIds(){
 
     }
 
@@ -261,7 +268,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             Logger.getLogger(JmeFragmentBase.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+//region multiplayer
     private boolean haveNetworkConnection() {
         boolean haveConnectedWifi = false;
         boolean haveConnectedMobile = false;
@@ -300,6 +307,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
 @Override
     public void signOut(boolean google_signout){
+        if (mDatabase!=null) mDatabase=null;
         if (google_signout) {
             Task<Void> task = mGoogleSignInClient.signOut();
             task.addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -322,6 +330,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     }
 
 
+
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -333,6 +344,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                     GoogleSignInAccount account =  task.getResult(ApiException.class);
                     firebaseAuthWithGoogle(account.getIdToken());
                     Toast.makeText(getActivity().getBaseContext(),"Sign in as "+account.getDisplayName(),Toast.LENGTH_SHORT ).show();
+                    mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference();
                 } catch (ApiException e) {
                     // Google Sign In failed, update UI appropriately
                     Log.w("Yss1", "Google sign in failed:" , e);
@@ -367,6 +379,39 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                 });
     }
 
+    public void mp_writeDB(String field, String value){
+        if (mDatabase==null) return;
+        mDatabase.child(field).setValue(value);
+        //Task<Void> task=myRef.setValue(value);
+        //task.
+    }
+
+    public String mp_readData(String field){
+        if (mDatabase==null) return "";
+    }
+
+    public void mp_connectDataReceiverFor(String field){
+        if (mDatabase==null) return;
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                jmeapp.recvData(field,value);
+                //Log.d(TAG, "Value is: " + value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                //Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+
+    //endregion multiplayer
 
     @Override
     public void onResume() {
@@ -428,9 +473,6 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-//Application a=getJmeApplication();
-//System.runFinalization();
-//android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     @Override
@@ -744,7 +786,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     }
     //endregion of SETTINGS SAVE_LOAD
 
-    //Google Analytics
+//region Google Analytics
     @Override
     public void sendEventGA(String app, String s) {
         Bundle bundle = new Bundle();
@@ -752,83 +794,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LEVEL_START, bundle);
     }
 
-    @Override
-    public boolean gp_isSignedIn() {
-        return false;
-    }
-
-    @Override
-    public void gp_Connect() {
-
-    }
-
-    @Override
-    public void gp_Disconnect() {
-
-    }
-
-    @Override
-    public void gp_ShowAchivements() {
-
-    }
-
-    @Override
-    public void gp_ShowLeaderboard(String id) {
-
-    }
-
-    @Override
-    public void gp_SubmitScore(String id, int sc) {
-
-    }
-
-    @Override
-    public void gp_UnlockAchivement(String Aid) {
-
-    }
-
-    @Override
-    public void gp_IncrementAchivement(String Aid, int sc) {
-
-    }
-
-    @Override
-    public void mp_SelectOpponents(boolean allowAutomatch) {
-
-    }
-
-    @Override
-    public void mp_QuickStartGame() {
-
-    }
-
-    @Override
-    public void mp_StartWaitingRoom() {
-
-    }
-
-    @Override
-    public void mp_InvitationInbox() {
-
-    }
-
-    @Override
-    public int mp_MaxMessageLength() {
-        return 0;
-    }
-
-    @Override
-    public int mp_SendTo(String id, byte[] data) {
-        return 0;
-    }
-
-    @Override
-    public void mp_endNetworkGame() {
-
-    }
-
-
-    //end Google Analytics
+    //endregion Google Analytics
 
 
     @Override
