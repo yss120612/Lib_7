@@ -292,7 +292,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
 
     @Override
-    public void signIn() {
+    public void mp_signIn() {
         if (!haveNetworkConnection()) return;
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(mClientID)
@@ -300,13 +300,13 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
-        signOut(true);
+        mp_signOut(true);
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
 @Override
-    public void signOut(boolean google_signout){
+    public void mp_signOut(boolean google_signout){
         if (mDatabase!=null) mDatabase=null;
         if (google_signout) {
             Task<Void> task = mGoogleSignInClient.signOut();
@@ -325,7 +325,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
 
     @Override
-    public boolean isSignedIn(){
+    public boolean mp_isSignedIn(){
         return user!=null;
     }
 
@@ -344,7 +344,12 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                     GoogleSignInAccount account =  task.getResult(ApiException.class);
                     firebaseAuthWithGoogle(account.getIdToken());
                     Toast.makeText(getActivity().getBaseContext(),"Sign in as "+account.getDisplayName(),Toast.LENGTH_SHORT ).show();
-                    mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference();
+//                    try{
+//                        mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference();
+//                    }
+//                    catch (Exception ex){
+//                        ex.getMessage();
+//                    }
                 } catch (ApiException e) {
                     // Google Sign In failed, update UI appropriately
                     Log.w("Yss1", "Google sign in failed:" , e);
@@ -386,8 +391,23 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         //task.
     }
 
-    public String mp_readData(String field){
-        if (mDatabase==null) return "";
+    public void mp_readDB(String field){
+        if (mDatabase==null) return;
+
+        mDatabase.child(field).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>()
+        {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                }
+                else {
+                    jmeapp.recvData(field,task.getResult().getValue(String.class));
+                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                }
+            }
+        });
+
     }
 
     public void mp_connectDataReceiverFor(String field){
@@ -418,7 +438,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         super.onResume();
         mAutoStartSignIn = loadSettingBool("AUTOLOGON", false);
         if (mAutoStartSignIn && haveNetworkConnection()) {
-            gp_Connect();
+            if (!mp_isSignedIn()) mp_signIn();
         }
         if (mAdView != null) {
             mAdView.resume();
