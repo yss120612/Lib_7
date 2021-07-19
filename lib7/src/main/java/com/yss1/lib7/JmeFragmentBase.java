@@ -67,6 +67,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 
+
 /*
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -239,6 +240,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
 
     //override for set id's
+
     public void setIds(){
 
     }
