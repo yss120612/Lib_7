@@ -346,12 +346,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                     GoogleSignInAccount account =  task.getResult(ApiException.class);
                     firebaseAuthWithGoogle(account.getIdToken());
                     Toast.makeText(getActivity().getBaseContext(),"Sign in as "+account.getDisplayName(),Toast.LENGTH_SHORT ).show();
-//                    try{
-//                        mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference();
-//                    }
-//                    catch (Exception ex){
-//                        ex.getMessage();
-//                    }
+                    mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference();
                 } catch (ApiException e) {
                     // Google Sign In failed, update UI appropriately
                     Log.w("Yss1", "Google sign in failed:" , e);
@@ -911,6 +906,29 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             }
         }
     }
+
+
+//    public class DialogNew extends DialogFragment {
+//        private View rootView;
+//        private String title;
+//        private String message; // Do nothing by default
+//        private Consumer mSuccess = (boolean b) -> {};
+//        private Runnable mCancel = () -> {};
+//        public void setArgs(String title, String message)
+//        { Bundle args = new Bundle();
+//        args.putString("title", title);
+//        args.putString("message", message);
+//        setArguments(args);
+//        }
+//        @Override public void onCreate(Bundle savedInstanceState)
+//        { super.onCreate(savedInstanceState); setStyle(STYLE_NO_TITLE, 0); }
+//        @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)  {
+//            rootView = inflater.inflate(R.layout.fragment_new_dialog, container, false); // use mSuccess.accept(boolean) when needed init();
+//            setListeners(); return rootView;
+//        }
+//        public void setSuccess(Consumer success) { mSuccess = success; }
+//        public void setCancel(Runnable cancel) { mCancel = cancel; }
+//    }
 
     @SuppressLint("ValidFragment")
     public class MessageDialog extends DialogFragment implements OnClickListener {
