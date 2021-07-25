@@ -816,7 +816,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public void getInput(int dType, String title, String sinit) {
-        new EditNameDialog().init(dType, title, sinit).
+        new EditNameDialog().init(dType, title, sinit, this).
                 show(getFragmentManager(), "Inp");
     }
 
@@ -824,7 +824,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     @Override
     public void showMessage(String tit, String msg) {
 
-        new MessageDialog().init(tit, msg).show(getFragmentManager(), "msg");
+        new MessageDialog().init(tit, msg,this).show(getFragmentManager(), "msg");
     }
 
 
@@ -848,64 +848,15 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         else{
             info="User is null";
         }
-        new MessageDialog().init(tit, info).show(getFragmentManager(), "msg");
+        new MessageDialog().init(tit,info,this).show(getFragmentManager(), "msg");
     }
 
     public int getID(int idFor) {
         return 0;
     }
 
-    @SuppressLint("ValidFragment")
-    public class EditNameDialog extends DialogFragment implements OnClickListener {
+   // @SuppressLint("ValidFragment")
 
-        private EditText mEditText;
-        private String eText;
-        private String eTitle;
-        private int type;
-        private View form = null;
-
-        public EditNameDialog() {
-            // Empty constructor required for DialogFragment
-        }
-
-        public EditNameDialog init(int dt, String eTitle, String eText) {
-            this.eText = eText;
-            this.eTitle = eTitle;
-            this.type = dt;
-            return this;
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-            mEditText = (EditText) form.findViewById(getID(202));
-            mEditText.setText(eText);
-            mEditText.requestFocus();
-            getDialog().setTitle(eTitle);
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
-            form = getActivity().getLayoutInflater().inflate(getID(2), null);
-            adb.setView(form).
-                    setPositiveButton(ToolsBase.getTextBase(601), (OnClickListener) this).
-                    setNegativeButton(ToolsBase.getTextBase(602), this).
-                    setTitle("Ti");
-            return adb.create();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (which) {
-                case Dialog.BUTTON_POSITIVE:
-                    jmeapp.stringFromDialog(type, mEditText.getText().toString());
-                    break;
-                case Dialog.BUTTON_NEGATIVE:
-                    break;
-            }
-        }
-    }
 
 
 //    public class DialogNew extends DialogFragment {
@@ -930,121 +881,83 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 //        public void setCancel(Runnable cancel) { mCancel = cancel; }
 //    }
 
-    @SuppressLint("ValidFragment")
-    public class MessageDialog extends DialogFragment implements OnClickListener {
+   // @SuppressLint("ValidFragment")
 
-        private String eText;
-        private String eTitle;
-        private View form = null;
-        private TextView mViewText;
 
-        public MessageDialog() {
-            // Empty constructor required for DialogFragment
-        }
-
-        public MessageDialog init(String eTitle, String eText) {
-            this.eText = eText;
-            this.eTitle = eTitle;
-            return this;
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-            mViewText = (TextView) form.findViewById(getID(101));
-            mViewText.setText(eText);
-            getDialog().setTitle(eTitle);
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
-            form = getActivity().getLayoutInflater().inflate(getID(1), null);
-            adb.setView(form).
-                    setPositiveButton("OK", this).
-                    setTitle("Ti");
-            return adb.create();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-        }
-    }
-
-    @SuppressLint("ValidFragment")
-    public class AnswerDialog extends DialogFragment implements OnClickListener {
-
-        private String eText;
-        private String eTitle;
-        private View form = null;
-        private int type;
-        private TextView mViewText;
-
-        public AnswerDialog() {
-            // Empty constructor required for DialogFragment
-        }
-
-        public AnswerDialog init(int dt, String eTitle, String eText) {
-            this.eText = eText;
-            this.eTitle = eTitle;
-            type = dt;
-            return this;
-        }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-            mViewText = (TextView) form.findViewById(getID(101));
-            mViewText.setText(eText);
-            getDialog().setTitle(eTitle);
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
-            form = getActivity().getLayoutInflater().inflate(getID(1), null);
-            String okBtn = "";
-            String negBtn = "";
-            switch (type) {
-                case 0:
-                    okBtn = ToolsBase.getTextBase(603);
-                    negBtn = ToolsBase.getTextBase(604);
-                    break;
-            }
-            adb.setView(form).setTitle("Ti").
-                    setPositiveButton(okBtn, this).
-                    setNegativeButton(negBtn, this);
-            return adb.create();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (type) {
-                case 0:
-                    switch (which) {
-                        case Dialog.BUTTON_POSITIVE:
-//                            mp_endNetworkGame();
-//                            RoomConfig.Builder roomConfigBuilder = mp_makeBasicRoomConfigBuilder();
-//                            roomConfigBuilder.setInvitationIdToAccept(mIncomingInvitationId);
-//                            Games.RealTimeMultiplayer.join(mGoogleApiClient, roomConfigBuilder.build());
-                            break;
-                        case Dialog.BUTTON_NEGATIVE:
-//                            Games.RealTimeMultiplayer.declineInvitation(mGoogleApiClient, mIncomingInvitationId);
-                            break;
-                    }
-                    break;
-                case 1:
-                    switch (which) {
-                        case Dialog.BUTTON_POSITIVE:
-                            break;
-                        case Dialog.BUTTON_NEGATIVE:
-                            break;
-                    }
-                    break;
-            }
-
-        }
-    }
+//    @SuppressLint("ValidFragment")
+//    public class AnswerDialog extends DialogFragment implements OnClickListener {
+//
+//        private String eText;
+//        private String eTitle;
+//        private View form = null;
+//        private int type;
+//        private TextView mViewText;
+//
+//        public AnswerDialog() {
+//            // Empty constructor required for DialogFragment
+//        }
+//
+//        public AnswerDialog init(int dt, String eTitle, String eText) {
+//            this.eText = eText;
+//            this.eTitle = eTitle;
+//            type = dt;
+//            return this;
+//        }
+//
+//        @Override
+//        public void onStart() {
+//            super.onStart();
+//            mViewText = (TextView) form.findViewById(getID(101));
+//            mViewText.setText(eText);
+//            getDialog().setTitle(eTitle);
+//        }
+//
+//        @Override
+//        public Dialog onCreateDialog(Bundle savedInstanceState) {
+//            AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
+//            form = getActivity().getLayoutInflater().inflate(getID(1), null);
+//            String okBtn = "";
+//            String negBtn = "";
+//            switch (type) {
+//                case 0:
+//                    okBtn = ToolsBase.getTextBase(603);
+//                    negBtn = ToolsBase.getTextBase(604);
+//                    break;
+//            }
+//            adb.setView(form).setTitle("Ti").
+//                    setPositiveButton(okBtn, this).
+//                    setNegativeButton(negBtn, this);
+//            return adb.create();
+//        }
+//
+//        @Override
+//        public void onClick(DialogInterface dialog, int which) {
+//            switch (type) {
+//                case 0:
+//                    switch (which) {
+//                        case Dialog.BUTTON_POSITIVE:
+////                            mp_endNetworkGame();
+////                            RoomConfig.Builder roomConfigBuilder = mp_makeBasicRoomConfigBuilder();
+////                            roomConfigBuilder.setInvitationIdToAccept(mIncomingInvitationId);
+////                            Games.RealTimeMultiplayer.join(mGoogleApiClient, roomConfigBuilder.build());
+//                            break;
+//                        case Dialog.BUTTON_NEGATIVE:
+////                            Games.RealTimeMultiplayer.declineInvitation(mGoogleApiClient, mIncomingInvitationId);
+//                            break;
+//                    }
+//                    break;
+//                case 1:
+//                    switch (which) {
+//                        case Dialog.BUTTON_POSITIVE:
+//                            break;
+//                        case Dialog.BUTTON_NEGATIVE:
+//                            break;
+//                    }
+//                    break;
+//            }
+//
+//        }
+//    }
 
 
 
