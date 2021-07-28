@@ -383,7 +383,8 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     public void mp_writeDB(String field, String value){
         if (mDatabase==null) return;
-        mDatabase.child(field).setValue(value);
+        mDatabase.child("kabs").child(field).setValue(value);
+        //mDatabase.child(field).setValue(value);
         //Task<Void> task=myRef.setValue(value);
         //task.
     }
@@ -391,7 +392,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public void mp_readDB(String field){
         if (mDatabase==null) return;
 
-        mDatabase.child(field).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>()
+        mDatabase.child("kabs").child(field).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>()
         {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -409,7 +410,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     public void mp_connectDataReceiverFor(String field){
         if (mDatabase==null) return;
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        mDatabase.child("kabs").child(field).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
