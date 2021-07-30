@@ -381,7 +381,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                 });
     }
 
-    public void mp_writeDB(String field, String value){
+    //region db_operations
+
+    public void mp_writeDB(String field, Map<String,Object> value){
         if (mDatabase==null) return;
         mDatabase.child(field).setValue(value);
         //mDatabase.child(field).setValue(value);
@@ -400,7 +402,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                     Log.e("firebase", "Error getting data", task.getException());
                 }
                 else {
-                    jmeapp.recvData(field,task.getResult().getValue().toString());
+                    jmeapp.recvData(field,task.getResult().getValue());
                     Log.d("firebase", String.valueOf(task.getResult().getValue()));
                 }
             }
@@ -427,7 +429,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             }
         });
     }
-
+//endregion db_operations
 
     //endregion multiplayer
 
