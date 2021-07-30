@@ -346,7 +346,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                     GoogleSignInAccount account =  task.getResult(ApiException.class);
                     firebaseAuthWithGoogle(account.getIdToken());
                     Toast.makeText(getActivity().getBaseContext(),"Sign in as "+account.getDisplayName(),Toast.LENGTH_SHORT ).show();
-                    mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference();
+                    mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference("kabs");
                 } catch (ApiException e) {
                     // Google Sign In failed, update UI appropriately
                     Log.w("Yss1", "Google sign in failed:" , e);
@@ -383,7 +383,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     public void mp_writeDB(String field, String value){
         if (mDatabase==null) return;
-        mDatabase.child("kabs").child(field).setValue(value);
+        mDatabase.child(field).setValue(value);
         //mDatabase.child(field).setValue(value);
         //Task<Void> task=myRef.setValue(value);
         //task.
@@ -392,7 +392,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public void mp_readDB(String field){
         if (mDatabase==null) return;
 
-        mDatabase.child("kabs").child(field).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>()
+        mDatabase.child(field).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>()
         {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -400,7 +400,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                     Log.e("firebase", "Error getting data", task.getException());
                 }
                 else {
-                    jmeapp.recvData(field,task.getResult().getValue(String.class));
+                    jmeapp.recvData(field,task.getResult().getValue().toString());
                     Log.d("firebase", String.valueOf(task.getResult().getValue()));
                 }
             }
@@ -410,12 +410,12 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     public void mp_connectDataReceiverFor(String field){
         if (mDatabase==null) return;
-        mDatabase.child("kabs").child(field).addValueEventListener(new ValueEventListener() {
+        mDatabase.child(field).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
+                String value = dataSnapshot.getValue().toString();
                 jmeapp.recvData(field,value);
                 //Log.d(TAG, "Value is: " + value);
             }
