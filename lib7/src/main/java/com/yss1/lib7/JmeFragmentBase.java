@@ -402,7 +402,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                     Log.e("firebase", "Error getting data", task.getException());
                 }
                 else {
-                    jmeapp.recvData(field,task.getResult().getValue());
+                    jmeapp.recvData(field,(Map<String,Object>)task.getResult().getValue());
                     Log.d("firebase", String.valueOf(task.getResult().getValue()));
                 }
             }
@@ -417,7 +417,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue().toString();
+                Map<String,Object> value = (Map<String,Object>)dataSnapshot.getValue();
                 jmeapp.recvData(field,value);
                 //Log.d(TAG, "Value is: " + value);
             }
