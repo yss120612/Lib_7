@@ -399,13 +399,21 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (!task.isSuccessful()) {
+                    //showInfo("ERROR");
                     Log.e("firebase", "Error getting data", task.getException());
+
                 }
                 else {
-                    jmeapp.recvData(field,(Map<String,Object>)task.getResult().getValue());
-                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                    if (task.getResult()==null||task.getResult().getValue()==null){
+                        jmeapp.recvData(field,null);
+                    }
+                    else {
+                        jmeapp.recvData(field, (Map<String, Object>) task.getResult().getValue());
+                    }
+                    //Log.d("firebase", String.valueOf(task.getResult().getValue()));
                 }
             }
+
         });
 
     }
