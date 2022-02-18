@@ -24,7 +24,7 @@ allprojects {
 
 //def jme3 = [v:'3.3.2-stable', g:'org.jmonkeyengine']
 //def jme3_android = [v:'3.3.0-alpha2', g:'org.jmonkeyengine']
-def jme3 = [v:'3.4.0-stable', g:'org.jmonkeyengine']
+def jme3 = [v:'3.5.0-stable', g:'org.jmonkeyengine']
 
 project(":lib7") {
     apply plugin: "com.android.library"
