@@ -2,11 +2,11 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.android.tools.build:gradle:8.5.2'
+        //classpath 'com.google.gms:google-services:4.4.2'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -15,7 +15,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         flatDir {
             dirs '../../lib_jm/lib_jm/build/libs'
         }
@@ -24,16 +24,18 @@ allprojects {
 
 //def jme3 = [v:'3.3.2-stable', g:'org.jmonkeyengine']
 //def jme3_android = [v:'3.3.0-alpha2', g:'org.jmonkeyengine']
-def jme3 = [v:'3.5.0-stable', g:'org.jmonkeyengine']
+//def jme3 = [v:'3.6.0-stable', g:'org.jmonkeyengine']
+ext.jmonkeyengineVersion = '3.6.1-stable'
+
+configurations.all {
+    exclude group: 'org.jmonkeyengine', module: 'jme3-desktop'
+}
 
 project(":lib7") {
     apply plugin: "com.android.library"
 
     dependencies {
-        implementation(name: 'lib_jm', ext: 'jar')
-   //     implementation "${jme3.g}:jme3-core:${jme3.v}"
-        //implementation "${jme3_android.g}:jme3-android-native:${jme3_android.v}"
-        implementation "${jme3.g}:jme3-android-native:${jme3.v}"
+
     }
 }
 

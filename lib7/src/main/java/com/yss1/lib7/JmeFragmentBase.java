@@ -1,12 +1,5 @@
 package com.yss1.lib7;
 
-//package com.yss1.android;
-
-
-import android.annotation.SuppressLint;
-
-//import static com.google.android.gms.internal.ads.zzako.runOnUiThread;
-//import com.yss1.lib7.AndroidIF;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,82 +7,26 @@ import java.util.Map;
 import java.util.Set;
 
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.WindowManager;
-import android.widget.EditText;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
-//import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 
-
-/*
-import com.google.android.gms.common.api.GoogleApiClient;
-
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesActivityResultCodes;
-import com.google.android.gms.games.GamesStatusCodes;
-
-import com.google.android.gms.games.Player;
-
-import com.google.android.gms.games.multiplayer.Invitation;
-import com.google.android.gms.games.multiplayer.Multiplayer;
-import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
-import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-import com.google.android.gms.games.multiplayer.Participant;
-import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
-import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
-import com.google.android.gms.games.multiplayer.realtime.RealTimeMultiplayer.ReliableMessageSentCallback;
-import com.google.android.gms.games.multiplayer.realtime.Room;
-import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
-import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
-import static com.google.android.gms.internal.zzir.runOnUiThread;
-*/
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -99,26 +36,20 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.jme3.app.AndroidHarnessFragment;
+import com.jme3.app.AndroidHarness;
 
 
 import com.yss1.lib_jm.AppIF;
-import com.yss1.lib_jm.SettBase;
-import com.yss1.lib_jm.ToolsBase;
-import com.yss1.lib_jm.UserBase;
 import com.yss1.lib_jm.AndroidIF;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static android.app.Activity.RESULT_OK;
 
 
-public class JmeFragmentBase extends AndroidHarnessFragment implements
+public class JmeFragmentBase extends AndroidHarness implements
         AndroidIF
 //        GoogleApiClient.ConnectionCallbacks,
 //        GoogleApiClient.OnConnectionFailedListener,
@@ -130,9 +61,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         //AdListener
 {
     //protected MobileAds mMobileAds;
-    protected AdView mAdView;
+    //protected AdView mAdView;
     protected String mAdViewID;
-    protected InterstitialAd mInterstitialAd;
+    //protected InterstitialAd mInterstitialAd;
     protected String mInterstitialAdID;
 
 
@@ -141,7 +72,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     protected SharedPreferences mSettings;
     protected FirebaseAuth mAuth;
     protected FirebaseUser user;
-    protected GoogleSignInClient mGoogleSignInClient;
+    //protected GoogleSignInClient mGoogleSignInClient;
     protected String mClientID;
     protected String mURLdb;
     protected DatabaseReference mDatabase;
@@ -159,13 +90,13 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     boolean isServer = false;
 
     //tune in concret implementation
-    protected static int MIN_PLAYERS = -1;
+    protected int MIN_PLAYERS = -1;
 
 
     protected boolean trakerSent;
-//    protected static boolean GP_ACTIVATE;
+    //    protected static boolean GP_ACTIVATE;
 //    protected static boolean GP_MULTIPLAYER;
-    protected static boolean AD_BANNER;
+    protected boolean AD_BANNER;
 
     private boolean off_screen;
     private boolean tmp_ad_loaded;
@@ -199,7 +130,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         joystickEventsEnabled = false;
         keyEventsEnabled = false;
         startTime = System.nanoTime();
-        mInterstitialAd = null;
+        // mInterstitialAd = null;
         trakerSent = false;
 //        GP_ACTIVATE = false;
 //        GP_MULTIPLAYER = false;
@@ -216,39 +147,40 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         } else {
             throw new IllegalArgumentException("app is null!");
         }
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         checkVersion();
 
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        return v;
-    }
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        View v = super.onCreateView(inflater, container, savedInstanceState);
+//        return v;
+//    }
 
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity().getBaseContext());
-        mAuth = FirebaseAuth.getInstance();
-        MobileAds.initialize(getActivity().getBaseContext());
-        setIds();
-        initBanner();
-        loadAd();
-    }
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getActivity().getBaseContext());
+//        mAuth = FirebaseAuth.getInstance();
+//        MobileAds.initialize(getActivity().getBaseContext());
+//        setIds();
+//        initBanner();
+//        loadAd();
+//    }
 
 
     //override for set id's
 
-    public void setIds(){
+    public void setIds() {
 
     }
 
 
     private void checkVersion() {
         try {
-            PackageInfo pinfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+            PackageInfo pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             int versionNumber = pinfo.versionCode;
             int savedVersion = loadSettingInt("VERSION", 0);
             if (versionNumber != savedVersion && savedVersion != 0) {
@@ -270,12 +202,13 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
             Logger.getLogger(JmeFragmentBase.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-//region multiplayer
+
+    //region multiplayer
     private boolean haveNetworkConnection() {
         boolean haveConnectedWifi = false;
         boolean haveConnectedMobile = false;
 
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo[] networkInfo = cm.getAllNetworkInfo();
         for (NetworkInfo nw : networkInfo) {
             if (nw.getTypeName().equalsIgnoreCase("WIFI")) {
@@ -295,68 +228,64 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public void mp_signIn() {
-        if (!haveNetworkConnection()) return;
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(mClientID)
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-
-        mp_signOut(true);
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+//        if (!haveNetworkConnection()) return;
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(mClientID)
+//                .requestEmail()
+//                .build();
+//        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+//
+//        mp_signOut(true);
+//                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+//        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-@Override
-    public void mp_signOut(boolean google_signout){
-        if (mDatabase!=null) mDatabase=null;
-        if (google_signout) {
-            Task<Void> task = mGoogleSignInClient.signOut();
-            task.addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(Task<Void> t) {
-                    Toast.makeText(getActivity().getBaseContext(), "Signed out", Toast.LENGTH_SHORT).show();
-                    // showInfo("Success logout");
-                }
-            });
-        }
-        if (mAuth!=null) mAuth.signOut();
-        user = mAuth.getCurrentUser();
+    @Override
+    public void mp_signOut(boolean google_signout) {
+//        if (mDatabase!=null) mDatabase=null;
+//        if (google_signout) {
+//            Task<Void> task = mGoogleSignInClient.signOut();
+//            task.addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(Task<Void> t) {
+//                    Toast.makeText(getBaseContext(), "Signed out", Toast.LENGTH_SHORT).show();
+//                    // showInfo("Success logout");
+//                }
+//            });
+//        }
+//        if (mAuth!=null) mAuth.signOut();
+//        user = mAuth.getCurrentUser();
     }
-
 
 
     @Override
-    public boolean mp_isSignedIn(){
-        return user!=null;
+    public boolean mp_isSignedIn() {
+        return user != null;
     }
-
-
-
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                try {
-                    // Google Sign In was successful, authenticate with Firebase
-                    GoogleSignInAccount account =  task.getResult(ApiException.class);
-                    firebaseAuthWithGoogle(account.getIdToken());
-                    Toast.makeText(getActivity().getBaseContext(),"Sign in as "+account.getDisplayName(),Toast.LENGTH_SHORT ).show();
-                    mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference("kabs");
-                } catch (ApiException e) {
-                    // Google Sign In failed, update UI appropriately
-                    Log.w("Yss1", "Google sign in failed:" , e);
-                    showMessage("Connection failed","not connected "+e.getLocalizedMessage());
-                }
-            } else {
-                Log.d("Yss1", "Login canceled by user");
-                showMessage("NOT Connected","user cancelled");
-            }
-        }
+//        if (requestCode == RC_SIGN_IN) {
+//            if (resultCode == RESULT_OK) {
+//                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+//                try {
+//                    // Google Sign In was successful, authenticate with Firebase
+//                    GoogleSignInAccount account =  task.getResult(ApiException.class);
+//                    firebaseAuthWithGoogle(account.getIdToken());
+//                    Toast.makeText(getBaseContext(),"Sign in as "+account.getDisplayName(),Toast.LENGTH_SHORT ).show();
+//                    mDatabase = FirebaseDatabase.getInstance(mURLdb).getReference("kabs");
+//                } catch (ApiException e) {
+//                    // Google Sign In failed, update UI appropriately
+//                    Log.w("Yss1", "Google sign in failed:" , e);
+//                    showMessage("Connection failed","not connected "+e.getLocalizedMessage());
+//                }
+//            } else {
+//                Log.d("Yss1", "Login canceled by user");
+//                showMessage("NOT Connected","user cancelled");
+//            }
+//        }
     }
 
 
@@ -364,7 +293,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
 
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this.getActivity(), new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -377,37 +306,34 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
                             //updateUI(null);
                         }
 
-                                            }
+                    }
                 });
     }
 
     //region db_operations
 
-    public void mp_writeDB(String field, Map<String,Object> value){
-        if (mDatabase==null) return;
+    public void mp_writeDB(String field, Map<String, Object> value) {
+        if (mDatabase == null) return;
         mDatabase.child(field).setValue(value);
         //mDatabase.child(field).setValue(value);
         //Task<Void> task=myRef.setValue(value);
         //task.
     }
 
-    public void mp_readDB(String field){
-        if (mDatabase==null) return;
+    public void mp_readDB(String field) {
+        if (mDatabase == null) return;
 
-        mDatabase.child(field).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>()
-        {
+        mDatabase.child(field).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (!task.isSuccessful()) {
                     //showInfo("ERROR");
                     Log.e("firebase", "Error getting data", task.getException());
 
-                }
-                else {
-                    if (task.getResult()==null||task.getResult().getValue()==null){
-                        jmeapp.recvData(field,null);
-                    }
-                    else {
+                } else {
+                    if (task.getResult() == null || task.getResult().getValue() == null) {
+                        jmeapp.recvData(field, null);
+                    } else {
                         jmeapp.recvData(field, (Map<String, Object>) task.getResult().getValue());
                     }
                     //Log.d("firebase", String.valueOf(task.getResult().getValue()));
@@ -418,15 +344,15 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     }
 
-    public void mp_connectDataReceiverFor(String field){
-        if (mDatabase==null) return;
+    public void mp_connectDataReceiverFor(String field) {
+        if (mDatabase == null) return;
         mDatabase.child(field).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                Map<String,Object> value = (Map<String,Object>)dataSnapshot.getValue();
-                jmeapp.recvData(field,value);
+                Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
+                jmeapp.recvData(field, value);
                 //Log.d(TAG, "Value is: " + value);
             }
 
@@ -448,9 +374,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
         if (mAutoStartSignIn && haveNetworkConnection()) {
             if (!mp_isSignedIn()) mp_signIn();
         }
-        if (mAdView != null) {
-            mAdView.resume();
-        }
+//        if (mAdView != null) {
+//            mAdView.resume();
+//        }
         firstScreen = true;
     }
 
@@ -477,9 +403,9 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     public void onStop() {
         //если в сетевой игре, отключаемся по приходу уведомления о рассылке о выходе
         //иначе отсоединяемся прямо сдесь
-        if (mAdView != null) {
-            mAdView.pause();
-        }
+//        if (mAdView != null) {
+//            mAdView.pause();
+//        }
 
 //        if (gp_isSignedIn() && !mPlaying) {
 //            // gp_Disconnect();
@@ -490,18 +416,18 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
+//        if (mAdView != null) {
+//            mAdView.destroy();
+//        }
         super.onDestroy();
         System.runFinalization();
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//    }
 
     @Override
     public void rate(String what) {
@@ -521,20 +447,20 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     @Override
     public void setScreenOFF(boolean off) {
         off_screen = off;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (off_screen) {
-                        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    } else {
-                        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    }
-                } catch (Exception E) {
-                    Log.d("Yss", "Error in [setScreenOFF] " + E.getMessage());
-                }
-            }
-        });
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    if (off_screen) {
+//                        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//                    } else {
+//                        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//                    }
+//                } catch (Exception E) {
+//                    Log.d("Yss", "Error in [setScreenOFF] " + E.getMessage());
+//                }
+//            }
+//        });
     }
 
     @Override
@@ -547,106 +473,109 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public boolean isBannerVisible() {
-       return mAdView.getVisibility()==View.VISIBLE;
+        return false;
+        //mAdView.getVisibility()==View.VISIBLE;
     }
 
     @Override
     public void showBanner(boolean sb) {
-        if (mAdView == null) {
-            return;
-        }
-
-        if (sb) {
-            shBanner();
-        } else {
-            hideBanner();
-        }
+//        if (mAdView == null) {
+//            return;
+//        }
+        return;
+//        if (sb) {
+//            shBanner();
+//        } else {
+//            hideBanner();
+//        }
     }
 
     private void shBanner() {
-        if (mAdView == null) {
-            return;
-        }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //showMessage(mFirebaseAnalytics.getFirebaseInstanceId(), "visible");
-                    mAdView.setVisibility(View.VISIBLE);
-                } catch (Exception e) {
-                    showMessage("AD_MANNER"+AD_BANNER,"exception");
-                }
-            }
-        });
+
+//        if (mAdView == null) {
+//            return;
+//        }
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    //showMessage(mFirebaseAnalytics.getFirebaseInstanceId(), "visible");
+//                    mAdView.setVisibility(View.VISIBLE);
+//                } catch (Exception e) {
+//                    showMessage("AD_MANNER"+AD_BANNER,"exception");
+//                }
+//            }
+//        });
     }
 
     private void hideBanner() {
-        if (mAdView == null) {
-            return;
-        }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mAdView.setVisibility(View.GONE);
-                } catch (Exception e) {
-                }
-            }
-        });
+
+//        if (mAdView == null) {
+//            return;
+//        }
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    mAdView.setVisibility(View.GONE);
+//                } catch (Exception e) {
+//                }
+//            }
+//        });
     }
 
 
     @Override
     public void loadAd() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-             try {
-                    if (mInterstitialAd==null) {
-                        requestNewInterstitial();
-                    }
-                    if (mAdView != null) {
-                        AdRequest adRequest = new AdRequest.Builder().build();
-                        mAdView.loadAd(adRequest);
-                    }
-                } catch (Exception e) {
-                }
-            }
-        });
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//             try {
+//                    if (mInterstitialAd==null) {
+//                        requestNewInterstitial();
+//                    }
+//                    if (mAdView != null) {
+//                        AdRequest adRequest = new AdRequest.Builder().build();
+//                        mAdView.loadAd(adRequest);
+//                    }
+//                } catch (Exception e) {
+//                }
+//            }
+//        });
     }
 
-    private void initBanner(){
-        if (AD_BANNER) {
-            mAdView = new AdView(getActivity().getBaseContext());
-            mAdView.setAdSize(AdSize.BANNER);
-            FrameLayout LL=new FrameLayout(this.getActivity());
-            LL.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP+Gravity.RIGHT));
-
-            frameLayout.addView(LL);
-            LL.addView(mAdView);
-            mAdView.setVisibility(View.GONE);
-            mAdView.setAdUnitId(mAdViewID);
-        }
+    private void initBanner() {
+//        if (AD_BANNER) {
+//            mAdView = new AdView(getActivity().getBaseContext());
+//            mAdView.setAdSize(AdSize.BANNER);
+//            FrameLayout LL=new FrameLayout(this.getActivity());
+//            LL.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP+Gravity.RIGHT));
+//
+//            frameLayout.addView(LL);
+//            LL.addView(mAdView);
+//            mAdView.setVisibility(View.GONE);
+//            mAdView.setAdUnitId(mAdViewID);
+//        }
     }
 
 
     private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(getActivity().getBaseContext(),mInterstitialAdID, adRequest, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                 mInterstitialAd = interstitialAd;
- //               Log.i("Yss1", "onAdLoaded");
-            }
-
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                // Handle the error
-                Log.i("Yss1", loadAdError.getMessage());
-                mInterstitialAd = null;
-            }
-        });
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        InterstitialAd.load(getActivity().getBaseContext(),mInterstitialAdID, adRequest, new InterstitialAdLoadCallback() {
+//            @Override
+//            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+//                 mInterstitialAd = interstitialAd;
+// //               Log.i("Yss1", "onAdLoaded");
+//            }
+//
+//            @Override
+//            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+//                // Handle the error
+//                Log.i("Yss1", loadAdError.getMessage());
+//                mInterstitialAd = null;
+//            }
+//        });
 
 
         //AdRequest adRequest = new AdRequest.Builder().build();
@@ -655,34 +584,34 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 
     @Override
     public boolean isInterstitialLoaded() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    tmp_ad_loaded = mInterstitialAd!=null;
-                } catch (Exception e) {
-                    tmp_ad_loaded = false;
-                    Log.d("Yss", "tmp_loaded Error" + e.getMessage());
-                }
-            }
-        });
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    tmp_ad_loaded = mInterstitialAd!=null;
+//                } catch (Exception e) {
+//                    tmp_ad_loaded = false;
+//                    Log.d("Yss", "tmp_loaded Error" + e.getMessage());
+//                }
+//            }
+//        });
         return tmp_ad_loaded;
     }
 
     @Override
     public void displayInterstitial() {
-        if (mInterstitialAd != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mInterstitialAd.show(getActivity());
-                }
-            });
-
-        } else {
-            Log.d("Yss1", "The interstitial ad wasn't ready yet.");
-            loadAd();
-        }
+//        if (mInterstitialAd != null) {
+//            getActivity().runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mInterstitialAd.show(getActivity());
+//                }
+//            });
+//
+//        } else {
+//            Log.d("Yss1", "The interstitial ad wasn't ready yet.");
+//            loadAd();
+//        }
 
     }
 //endregion AD
@@ -814,11 +743,12 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     }
     //endregion of SETTINGS SAVE_LOAD
 
-//region Google Analytics
+    //region Google Analytics
     @Override
     public void sendEventGA(String app, String s) {
         Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.LEVEL_NAME, app + "_" + s);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, s);
+        bundle.putString(FirebaseAnalytics.Param.CONTENT, app + "_" + s);
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LEVEL_START, bundle);
     }
 
@@ -835,39 +765,37 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
     @Override
     public void showMessage(String tit, String msg) {
 
-        new MessageDialog().init(tit, msg,this).show(getFragmentManager(), "msg");
+        new MessageDialog().init(tit, msg, this).show(getFragmentManager(), "msg");
     }
 
 
     @Override
     public void showInfo(String tit) {
         user = mAuth.getCurrentUser();
-        String info="";
+        String info = "";
         if (user != null) {
             for (UserInfo profile : user.getProviderData()) {
                 // Id of the provider (ex: google.com)
-                info+="ProviderId=";
-                info+=profile.getProviderId();
-                info+=" Uid=";
-                info+=profile.getUid();
-                info+=" name=";
-                info+=profile.getDisplayName();
-                info+=" email=";
-                info+=profile.getEmail();
-           }
+                info += "ProviderId=";
+                info += profile.getProviderId();
+                info += " Uid=";
+                info += profile.getUid();
+                info += " name=";
+                info += profile.getDisplayName();
+                info += " email=";
+                info += profile.getEmail();
+            }
+        } else {
+            info = "User is null";
         }
-        else{
-            info="User is null";
-        }
-        new MessageDialog().init(tit,info,this).show(getFragmentManager(), "msg");
+        new MessageDialog().init(tit, info, this).show(getFragmentManager(), "msg");
     }
 
     public int getID(int idFor) {
         return 0;
     }
 
-   // @SuppressLint("ValidFragment")
-
+    // @SuppressLint("ValidFragment")
 
 
 //    public class DialogNew extends DialogFragment {
@@ -892,7 +820,7 @@ public class JmeFragmentBase extends AndroidHarnessFragment implements
 //        public void setCancel(Runnable cancel) { mCancel = cancel; }
 //    }
 
-   // @SuppressLint("ValidFragment")
+    // @SuppressLint("ValidFragment")
 
 
 //    @SuppressLint("ValidFragment")

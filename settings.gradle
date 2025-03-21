@@ -1,3 +1,2 @@
 include ':lib7'
-include ':app'
 rootProject.name = "Lib_7"
