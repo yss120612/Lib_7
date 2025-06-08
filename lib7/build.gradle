@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         minSdk 23
-        targetSdk 34
+        targetSdk 33
 
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.jmonkeyengine:jme3-android-native:'+jmonkeyengineVersion
     implementation 'org.jmonkeyengine:jme3-core:'+jmonkeyengineVersion
 
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
@@ -50,7 +50,7 @@ dependencies {
 
 
         // Import the Firebase BoM
-        implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+        implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
 
         // When using the BoM, you don't specify versions in Firebase library dependencies
 
