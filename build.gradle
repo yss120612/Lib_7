@@ -25,7 +25,7 @@ allprojects {
 //def jme3 = [v:'3.3.2-stable', g:'org.jmonkeyengine']
 //def jme3_android = [v:'3.3.0-alpha2', g:'org.jmonkeyengine']
 //def jme3 = [v:'3.6.0-stable', g:'org.jmonkeyengine']
-ext.jmonkeyengineVersion = '3.6.1-stable'
+ext.jmonkeyengineVersion = '3.8.1-stable'
 
 configurations.all {
     exclude group: 'org.jmonkeyengine', module: 'jme3-desktop'
